@@ -55,6 +55,14 @@ public Action<BiliBiliLiveGuardData> OnGuardCallBack;
 /// 监听SC回调函数
 public Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
 ```
+6. 获取用户头像
+也许你会需要获取对应用户的头像，本插件提供两种方法供选择
+```csharp
+// 获得Texture图像
+BiliBiliLive.GetHeadTexture(userId);
+// 获得精灵图像
+BiliBiliLive.GetHeadSprite(userId);
+```
 #### 4. 示例启动脚本
 ```csharp
 using UnityEngine;
