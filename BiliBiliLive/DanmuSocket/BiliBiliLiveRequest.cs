@@ -162,8 +162,15 @@ namespace Liluo.BiliBiliLive
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"接受消息时发生错误。错误信息: {e}");
-                _disconnect();
+                if (e is System.ObjectDisposedException)
+                {
+                    UnityEngine.Debug.LogWarning("连接已释放");
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"接受消息时发生错误。错误信息: {e}");
+                    _disconnect();
+                }
             }
         }
 
@@ -174,7 +181,7 @@ namespace Liluo.BiliBiliLive
                 case 3: 
                     {
                         // 观众人数
-                        var viewer = EndianBitConverter.BigEndian.ToUInt32(buffer, 0); 
+                        var viewer = EndianBitConverter.BigEndian.ToInt32(buffer, 0); 
                         OnRoomViewer?.Invoke(viewer);
                         break;
                     }
@@ -295,6 +302,7 @@ namespace Liluo.BiliBiliLive
             try
             {
                 client.Close();
+                netStream.Close();
                 UnityEngine.Debug.Log("断开连接");
             }
             catch (Exception e)

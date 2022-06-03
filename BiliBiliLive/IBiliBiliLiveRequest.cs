@@ -20,7 +20,7 @@ namespace Liluo.BiliBiliLive
         /// <summary>
         /// 房间人数改变时触发回调
         /// </summary>
-        public Action<uint> OnRoomViewer;
+        public Action<int> OnRoomViewer;
 
         /// <summary>
         /// 监听弹幕回调函数
