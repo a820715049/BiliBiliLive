@@ -35,7 +35,7 @@ void OnDestroy()
 4. 定时监听房间人数
 该函数每隔一段时间调用，其入参为当前房间人数（热度）。
 ```csharp
-req.OnRoomViewer = number =>
+req.OnRoomViewer += number =>
 {
     Debug.Log($"当前房间人数为: {number}");
 };
@@ -44,16 +44,16 @@ req.OnRoomViewer = number =>
 以下是个函数为主要监听使用函数，其入参分别为对应监听事件的相关信息结构体。VS中按下 **Ctrl+左键** 即可了解以下结构体提供的具体信息。
 ```csharp
 /// 监听弹幕回调函数
-public Action<BiliBiliLiveDanmuData> OnDanmuCallBack;
+event Action<BiliBiliLiveDanmuData> OnDanmuCallBack;
 
 /// 监听礼物回调函数
-public Action<BiliBiliLiveGiftData> OnGiftCallBack;
+event Action<BiliBiliLiveGiftData> OnGiftCallBack;
 
 /// 监听上舰回调函数
-public Action<BiliBiliLiveGuardData> OnGuardCallBack;
+event Action<BiliBiliLiveGuardData> OnGuardCallBack;
 
 /// 监听SC回调函数
-public Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
+event Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
 ```
 6. 获取用户头像
 也许你会需要获取对应用户的头像，本插件提供两种方法供选择
@@ -79,11 +79,11 @@ public class Online : MonoBehaviour
     {
         // 创建一个监听对象
         req = await BiliBiliLive.Connect(RoomID);
-        req.OnDanmuCallBack = GetDanmu;
-        req.OnGiftCallBack = GetGift;
-        req.OnSuperChatCallBack = GetSuperChat;
+        req.OnDanmuCallBack += GetDanmu;
+        req.OnGiftCallBack += GetGift;
+        req.OnSuperChatCallBack += GetSuperChat;
         bool flag = true;
-        req.OnRoomViewer = number =>
+        req.OnRoomViewer += number =>
         {
         	// 仅首次显示
             if (flag) Debug.Log($"当前房间人数为: {number}");

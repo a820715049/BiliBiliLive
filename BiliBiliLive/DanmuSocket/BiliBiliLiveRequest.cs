@@ -51,12 +51,18 @@ namespace Liluo.BiliBiliLive
         /// </summary>
         int chatPort = 2243;
 
+        public event Action<int> OnRoomViewer;
+        public event Action<BiliBiliLiveDanmuData> OnDanmuCallBack;
+        public event Action<BiliBiliLiveGiftData> OnGiftCallBack;
+        public event Action<BiliBiliLiveGuardData> OnGuardCallBack;
+        public event Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
+
         /// <summary>
         /// 申请异步连接  需要输入对应房间号
         /// </summary>
         /// <param name="roomId"></param>
         /// <returns></returns>
-        public override async Task<bool> Connect(int roomID)
+        public async Task<bool> Connect(int roomID)
         {
             if (connected)
             {
@@ -103,20 +109,23 @@ namespace Liluo.BiliBiliLive
             return false;
         }
         
-        public override void DisConnect() => _disconnect();
+        public void DisConnect() => _disconnect();
 
         async Task ReceiveMessageLoop()
         {
-            try
+            var stableBuffer = new byte[16];
+            var buffer = new byte[4096];
+            while (this.connected)
             {
-                var stableBuffer = new byte[16];
-                var buffer = new byte[4096];
-                while (this.connected)
+                try
                 {
                     await netStream.ReadAsync(stableBuffer, 0, 16);
                     var protocol = DanmakuProtocol.FromBuffer(stableBuffer);
                     if (protocol.PacketLength < 16)
-                        throw new NotSupportedException("协议失败: (L:" + protocol.PacketLength + ")");
+                    {
+                        UnityEngine.Debug.LogError("协议失败: (L:" + protocol.PacketLength + ")");
+                        continue;
+                    }
                     var payloadlength = protocol.PacketLength - 16;
                     if (payloadlength == 0) continue;
                     buffer = new byte[payloadlength];
@@ -159,17 +168,17 @@ namespace Liluo.BiliBiliLive
                         ProcessDanmaku(protocol.Action, buffer);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                if (e is System.ObjectDisposedException)
+                catch (Exception e)
                 {
-                    UnityEngine.Debug.LogWarning("连接已释放");
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError($"接受消息时发生错误。错误信息: {e}");
-                    _disconnect();
+                    if (e is System.ObjectDisposedException)
+                    {
+                        UnityEngine.Debug.LogWarning("连接已释放");
+                        break;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError($"接受消息时发生错误。错误信息: {e}");
+                    }
                 }
             }
         }
