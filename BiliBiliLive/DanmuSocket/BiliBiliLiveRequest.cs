@@ -51,12 +51,18 @@ namespace Liluo.BiliBiliLive
         /// </summary>
         int chatPort = 2243;
 
+        public event Action<int> OnRoomViewer;
+        public event Action<BiliBiliLiveDanmuData> OnDanmuCallBack;
+        public event Action<BiliBiliLiveGiftData> OnGiftCallBack;
+        public event Action<BiliBiliLiveGuardData> OnGuardCallBack;
+        public event Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
+
         /// <summary>
         /// 申请异步连接  需要输入对应房间号
         /// </summary>
         /// <param name="roomId"></param>
         /// <returns></returns>
-        public override async Task<bool> Connect(int roomID)
+        public async Task<bool> Connect(int roomID)
         {
             if (connected)
             {
@@ -103,7 +109,7 @@ namespace Liluo.BiliBiliLive
             return false;
         }
         
-        public override void DisConnect() => _disconnect();
+        public void DisConnect() => _disconnect();
 
         async Task ReceiveMessageLoop()
         {
