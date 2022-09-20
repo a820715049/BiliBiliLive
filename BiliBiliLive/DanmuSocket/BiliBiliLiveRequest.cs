@@ -56,6 +56,8 @@ namespace Liluo.BiliBiliLive
         public event Action<BiliBiliLiveGiftData> OnGiftCallBack;
         public event Action<BiliBiliLiveGuardData> OnGuardCallBack;
         public event Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
+        public event Action<Exception> OnErrorCallBack;
+        public event Action OnDisconnectCallBack;
 
         /// <summary>
         /// 申请异步连接  需要输入对应房间号
@@ -159,7 +161,7 @@ namespace Liluo.BiliBiliLive
                             }
                             catch (Exception e)
                             {
-                                UnityEngine.Debug.LogError($"读取弹幕消息失败。错误信息: {e}");
+                                OnErrorCallBack?.Invoke(e);
                             }
                         }
                     }
@@ -177,7 +179,7 @@ namespace Liluo.BiliBiliLive
                     }
                     else
                     {
-                        UnityEngine.Debug.LogError($"接受消息时发生错误。错误信息: {e}");
+                        OnErrorCallBack?.Invoke(e);
                     }
                 }
             }
@@ -297,7 +299,7 @@ namespace Liluo.BiliBiliLive
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"与服务器连接时发生错误。错误信息: {e}");
+                OnErrorCallBack?.Invoke(e);
                 _disconnect();
             }
 
@@ -313,10 +315,12 @@ namespace Liluo.BiliBiliLive
                 client.Close();
                 netStream.Close();
                 UnityEngine.Debug.Log("断开连接");
+                OnDisconnectCallBack?.Invoke();
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"断开连接时发生错误。错误信息: {e}");
+                OnDisconnectCallBack?.Invoke();
+                OnErrorCallBack?.Invoke(e);
             }
             netStream = null;
         }

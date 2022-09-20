@@ -41,5 +41,15 @@ namespace Liluo.BiliBiliLive
         /// 监听SC回调函数
         /// </summary>
         event Action<BiliBiliLiveSuperChatData> OnSuperChatCallBack;
+
+        /// <summary>
+        /// 监听运行出错时回调函数
+        /// </summary>
+        event Action<Exception> OnErrorCallBack;
+
+        /// <summary>
+        /// 监听连接释放时回调函数
+        /// </summary>
+        event Action OnDisconnectCallBack;
     }
 }
